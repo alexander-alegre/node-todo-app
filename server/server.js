@@ -21,6 +21,16 @@ app.post('/todos', (req, res) => {
     });
 });
 
+app.get('/todos', (req, res) => {
+    Todo.find().then( (todos) => {
+        res.send({
+            todos
+        });
+    }, (e) => {
+        res.status(400).send(e);
+    });
+});
+
 // setup port
 app.listen(3000, () => {
     console.log('http://localhost:3000/');
