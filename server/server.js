@@ -11,6 +11,7 @@ var app = express();
 const port = process.env.PORT || 3000;
 // middleware
 app.use(bodyParser.json());
+
 // post routes
 app.post('/todos', (req, res) => {
     var todo = new Todo({
@@ -31,6 +32,26 @@ app.get('/todos', (req, res) => {
         });
     }, (e) => {
         res.status(400).send(e);
+    });
+});
+
+// delete routes
+app.delete('/todos/:id', (req, res) => {
+    var id = req.params.id;
+    // validate the id
+    // not valid, send 404
+    if (!ObjectID.isValid(id)) {
+        return res.status(404).send();
+    }
+    // get the id
+    // remove to do by id
+    Todo.findByIdAndRemove(id).then((todo) => {
+        if(!todo) {
+            return res.status(404).send();
+        }
+        res.status(200).send(todo);
+    }).catch((e) => {
+        res.status(400).send();
     });
 });
 
