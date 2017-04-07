@@ -26,6 +26,20 @@ app.post('/todos', (req, res) => {
     });
 });
 
+// sign up users
+app.post('/user', (req, res) => {
+    var body = _.pick(req.body, ['email', 'password']);
+    var user = new User(body);
+
+    user.save().then((user) => {
+        return user.generateAuthToken();
+    }).then((token) => {
+        res.header('x-auth', token).send(user);
+    }).catch((e) => {
+        res.status(400).send(e);
+    });
+});
+
 // get routes
 app.get('/todos', (req, res) => {
     Todo.find().then( (todos) => {
@@ -72,7 +86,7 @@ app.delete('/todos/:id', (req, res) => {
 });
 
 // patch routes
-app.patch('/todo/:id', (req, res) => {
+app.patch('/todos/:id', (req, res) => {
     var id = req.params.id;
     var body  = _.pick(req.body, ['text', 'completed']);
     if (!ObjectID.isValid(id)) {
@@ -88,11 +102,11 @@ app.patch('/todo/:id', (req, res) => {
 
     Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then((todo) => {
         if (!todo) {
-            return res.status(400).send('cannot find id');
+            return res.status(400).send();
         }
         res.send({todo});
     }).catch((e) => {
-        res.status(400).send(e);
+        res.status(400).send();
     });
 });
 
